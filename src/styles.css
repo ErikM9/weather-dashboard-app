@@ -1,0 +1,282 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #9ed8ff, #5fa8d3);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.app {
+  text-align: center;
+  background: rgba(20, 50, 80, 0.75);
+  padding: 36px 36px 24px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 408px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  margin: auto;
+}
+
+h1 {
+  margin: 0 0 24px 0;
+  font-size: 2.16em;
+}
+
+/* Relative positioning is needed so the autocomplete list can be absolutely positioned below it */
+.search-box {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+#cityField {
+  width: 100%;
+  padding: 17px 19px;
+  font-size: 19px;
+  border: none;
+  background: rgba(180, 220, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  transition: background 0.3s;
+  border-radius: 30px;
+}
+
+/* Flattens the bottom corners so the input and dropdown look like one connected element */
+#cityField.show {
+  border-radius: 30px 30px 0 0;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+#cityField::placeholder {
+  color: rgba(200, 230, 255, 0.65);
+}
+
+#cityField:focus {
+  outline: none;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+.city-list {
+  list-style: none;
+  background: rgba(180, 220, 255, 0.25);
+  color: #fff;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  max-height: 165px;
+  overflow: hidden;
+  font-size: 19px;
+  backdrop-filter: blur(5px);
+}
+
+.city-list li {
+  padding: 14px 19px;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 55px;
+  display: flex;
+  align-items: center;
+}
+
+.city-list li:hover,
+.city-list li.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.city-list li:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.geo-btn {
+  display: block;
+  margin: 18px auto;
+  color: #a6ddff;
+  font-size: 1.2em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-shadow: 0 0 5px rgba(166, 221, 255, 0.5);
+  transition: 0.3s;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.geo-btn:hover {
+  color: #cfeeff;
+  text-shadow: 0 0 10px rgba(207, 238, 255, 0.8);
+}
+
+.geo-btn:active {
+  opacity: 0.8;
+}
+
+.geo-btn:focus-visible {
+  outline: 2px solid rgba(200, 230, 255, 0.8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.weather-box {
+  display: none;
+  margin-top: 24px;
+  padding: 24px;
+  background: rgba(180, 220, 255, 0.1);
+  border-radius: 18px;
+}
+
+.weather-box h2 {
+  margin-bottom: 12px;
+  font-size: 2.16em;
+}
+
+.weather-box p {
+  margin: 6px 0;
+  font-size: 1.56em;
+}
+
+.spinner {
+  border: 5px solid rgba(180, 220, 255, 0.15);
+  border-top: 5px solid rgba(166, 221, 255, 0.6);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  margin: 18px auto -2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fixed and pointer-events:none so it covers the full viewport without blocking any interactions */
+.rain-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Drops start above the viewport (bottom: 100%) and fall down via translateY(100vh) */
+.drop {
+  position: absolute;
+  bottom: 100%;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(to bottom, rgba(200, 230, 255, 0.3), rgba(200, 230, 255, 0.8));
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 18px;
+  }
+
+  .app {
+    max-width: 90%;
+    padding: 30px;
+    border-radius: 22px;
+  }
+
+  h1 {
+    font-size: 1.92em;
+  }
+
+  #cityField {
+    font-size: 18px;
+    padding: 14px 17px;
+  }
+
+  .weather-box h2 {
+    font-size: 1.92em;
+  }
+
+  .weather-box p {
+    font-size: 1.44em;
+  }
+
+  .geo-btn {
+    font-size: 1.14em;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+    align-items: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 408px;
+    border-radius: 24px;
+    padding: 24px 18px;
+  }
+
+  h1 {
+    font-size: 1.68em;
+    margin-bottom: 18px;
+  }
+
+  #cityField {
+    font-size: 17px;
+    padding: 12px 14px;
+  }
+
+  .city-list li {
+    font-size: 17px;
+    padding: 12px 14px;
+  }
+
+  .geo-btn {
+    font-size: 1.08em;
+    margin: 12px 0;
+  }
+
+  .weather-box {
+    padding: 18px;
+  }
+
+  .weather-box h2 {
+    font-size: 1.68em;
+  }
+
+  .weather-box p {
+    font-size: 1.32em;
+  }
+
+  .spinner {
+    width: 30px;
+    height: 30px;
+    border-width: 4px;
+  }
+}

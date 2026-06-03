@@ -1,0 +1,33 @@
+{
+  "name": "weather-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A weather dashboard application with city search and geolocation support",
+  "scripts": {
+  "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+  "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+  "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+  "test:e2e": "playwright test",
+  "test:e2e:headed": "playwright test --headed",
+  "test:all": "npm run test:coverage && npm run test:e2e",
+  "serve": "npx serve src -l 3000"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@testing-library/dom": "^9.3.3",
+    "@testing-library/jest-dom": "^6.1.5",
+    "cross-env": "^10.1.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "keywords": [
+    "weather",
+    "dashboard",
+    "testing",
+    "jest",
+    "playwright",
+    "msw"
+  ],
+  "author": "",
+  "license": "MIT"
+}
