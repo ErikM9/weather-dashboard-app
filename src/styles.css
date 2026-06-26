@@ -1,0 +1,258 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #9ed8ff, #5fa8d3);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.app {
+  text-align: center;
+  background: rgba(20, 50, 80, 0.75);
+  padding: 40px 40px 28px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  margin: auto;
+}
+
+/* Fluid scaling avoids oversized text on small screens while keeping the title on one line */
+h1 {
+  margin: 0 0 28px 0;
+  font-size: clamp(1.1rem, 7vw, 2.4rem);
+  white-space: nowrap;
+}
+
+/* Relative positioning anchors the autocomplete dropdown below the input */
+.search-box {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+#cityField {
+  width: 100%;
+  padding: 19px 22px;
+  font-size: clamp(15px, 4.4vw, 22px);
+  border: none;
+  background: rgba(180, 220, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  transition: background 0.3s;
+  border-radius: 30px;
+}
+
+/* Flatten bottom corners so the input and dropdown appear connected */
+#cityField.show {
+  border-radius: 30px 30px 0 0;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+#cityField::placeholder {
+  color: rgba(200, 230, 255, 0.65);
+}
+
+#cityField:focus {
+  outline: none;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+.city-list {
+  list-style: none;
+  background: rgba(180, 220, 255, 0.25);
+  color: #fff;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  max-height: 180px;
+  overflow: hidden;
+  font-size: clamp(15px, 4.4vw, 22px);
+  backdrop-filter: blur(5px);
+}
+
+.city-list li {
+  padding: 16px 22px;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.city-list li:hover,
+.city-list li.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.city-list li:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.geo-btn {
+  display: block;
+  margin: 20px auto;
+  color: #a6ddff;
+  font-size: clamp(1.05rem, 4.5vw, 1.4rem);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: 0.3s;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.geo-btn:hover {
+  color: #cfeeff;
+}
+
+.geo-btn:active {
+  opacity: 0.8;
+}
+
+.geo-btn:focus-visible {
+  outline: 2px solid rgba(200, 230, 255, 0.8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.weather-box {
+  display: none;
+  margin-top: 28px;
+  padding: 28px;
+  background: rgba(180, 220, 255, 0.1);
+  border-radius: 18px;
+}
+
+.weather-box h2 {
+  margin-bottom: 14px;
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+}
+
+.weather-box p {
+  margin: 6px 0;
+  font-size: clamp(1.15rem, 5.8vw, 1.85rem);
+}
+
+.spinner {
+  border: 5px solid rgba(180, 220, 255, 0.15);
+  border-top: 5px solid rgba(166, 221, 255, 0.6);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  margin: 18px auto -2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fixed with pointer-events disabled so the background never blocks interaction */
+.rain-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Raindrops begin above the viewport and animate downward */
+.drop {
+  position: absolute;
+  bottom: 100%;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(to bottom, rgba(200, 230, 255, 0.3), rgba(200, 230, 255, 0.8));
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 18px;
+  }
+
+  /* Keep horizontal padding fixed so inner content doesn't widen as the card shrinks */
+  .app {
+    padding: 34px 40px;
+    border-radius: 22px;
+  }
+
+  #cityField {
+    padding: 16px 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+    align-items: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    border-radius: 24px;
+    padding: 28px 40px;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  /* Match spacing above and below the search box for visual balance */
+  .search-box {
+    margin-bottom: 20px;
+  }
+
+  #cityField {
+    padding: 14px 16px;
+  }
+
+  .city-list li {
+    padding: 14px 16px;
+  }
+
+  .geo-btn {
+    margin: 14px auto;
+  }
+
+  .weather-box {
+    padding: 22px;
+  }
+
+  .spinner {
+    width: 30px;
+    height: 30px;
+    border-width: 4px;
+  }
+}
