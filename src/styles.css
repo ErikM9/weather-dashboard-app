@@ -1,0 +1,313 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #9ed8ff, #5fa8d3);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.app {
+  /* One gap value drives both the space between every component and the top/bottom padding, so the
+     distance is equal from the top border to the header, between each control, and down to the bottom */
+  --gap: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  background: rgba(20, 50, 80, 0.75);
+  padding: var(--gap) 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  margin: auto;
+  /* Lets the title size itself from the panel's width (the cqw unit below) */
+  container-type: inline-size;
+  /* The button's text size, which the weather card's spacing below it reads as well */
+  --btn-size: clamp(1.2rem, 5.1vw, 1.6rem);
+}
+
+/* The title is sized to run the width of the input below it: 100cqw is the panel's content width, which
+   is the input's width, and "Weather Dashboard" in Arial Bold is 9.43 times as wide as its font size, so
+   dividing by 9.72 lands the title at 97% of the input, leaving a little room for other fonts.
+   Its letters sit as far below the top border, and as far above the input, as the button's letters sit below
+   the input: the title's line keeps about a fifth of its size empty above its capitals and below its baseline,
+   against about a seventh of the button's size above the button's letters, so it is pulled in by the difference */
+h1 {
+  margin: calc(0.15 * var(--btn-size) - 0.17em) 0 calc(0.15 * var(--btn-size) - 0.22em);
+  font-size: clamp(1.1rem, 100cqw / 9.72, 3rem);
+  white-space: nowrap;
+}
+
+/* Relative positioning anchors the autocomplete dropdown below the input; vertical spacing comes from the parent's gap */
+.search-box {
+  position: relative;
+}
+
+#cityField {
+  width: 100%;
+  padding: 19px 22px;
+  font-size: clamp(15px, 4.4vw, 22px);
+  border: none;
+  background: rgba(180, 220, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  transition: background 0.3s;
+  border-radius: 30px;
+}
+
+/* Flatten bottom corners so the input and dropdown appear connected */
+#cityField.show {
+  border-radius: 30px 30px 0 0;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+#cityField::placeholder {
+  color: rgba(200, 230, 255, 0.65);
+}
+
+#cityField:focus {
+  outline: none;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+.city-list {
+  list-style: none;
+  background: rgba(180, 220, 255, 0.25);
+  color: #fff;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  max-height: 180px;
+  overflow: hidden;
+  font-size: clamp(15px, 4.4vw, 22px);
+  backdrop-filter: blur(5px);
+}
+
+.city-list li {
+  padding: 16px 22px;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.city-list li:hover,
+.city-list li.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.city-list li:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.geo-btn {
+  display: block;
+  /* Two pixels of margin above and below: the title's capitals sit about 10px inside its line box while this
+     line's letters sit only 6px inside theirs, so with the boxes evenly spaced the eye saw a little less room
+     around the button than around the title */
+  margin: 2px 0;
+  /* Lifted two pixels: the line is mostly lowercase, so its letters sit low in their box and otherwise read
+     as closer to the border below than to the input above, even though the boxes are evenly spaced */
+  position: relative;
+  top: -2px;
+  color: #a6ddff;
+  font-size: var(--btn-size);
+  cursor: pointer;
+  transition: 0.3s;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.geo-btn:hover {
+  color: #cfeeff;
+}
+
+.geo-btn:active {
+  opacity: 0.8;
+}
+
+.geo-btn:focus-visible {
+  outline: 2px solid rgba(200, 230, 255, 0.8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Sits as far below the button's letters as it does above the bottom border (the panel's gap each way). The gap
+   runs from the button's box, which ends below the letters by the button's 2px lift and 2px margin and by the room
+   its line keeps under them for descenders (a quarter of the text's size, unused as the line has no descenders),
+   so the card is pulled up by that much */
+.weather-box {
+  display: none;
+  margin-top: calc(-4px - 0.26 * var(--btn-size));
+  padding: 28px;
+  background: rgba(180, 220, 255, 0.1);
+  border-radius: 18px;
+}
+
+.weather-box h2 {
+  margin-bottom: 14px;
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+  /* A single word too long for the card breaks rather than running past it */
+  overflow-wrap: anywhere;
+}
+
+/* The place and the country each stay on one line, so a name that needs two breaks after its comma */
+.weather-box h2 span {
+  white-space: nowrap;
+}
+
+.weather-box p {
+  margin: 6px 0;
+  font-size: clamp(1.15rem, 5.8vw, 1.85rem);
+}
+
+/* The card leaves as much room under its last line as over its name. The name's line keeps about a sixth of the
+   name's size (--heading-size, set by the script) empty over its capitals, so the last line keeps that much under it,
+   less the little its own line already leaves under its letters */
+.weather-box p:last-child {
+  margin-bottom: calc(0.165 * var(--heading-size, 2.5rem) - 0.05em);
+}
+
+.spinner {
+  border: 5px solid rgba(180, 220, 255, 0.15);
+  border-top: 5px solid rgba(166, 221, 255, 0.6);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  /* The one exception to the panel's equal gaps: the spinner sits as far below the button's text as it does above
+     the bottom border (28px each). The button's line has ~6px of empty room under its letters, is lifted 2px and
+     carries 2px of margin, so the top pulls in by that much more than the bottom */
+  margin: -12px auto -2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Fixed with pointer-events disabled so the background never blocks interaction */
+.rain-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Raindrops begin above the viewport and animate downward */
+.drop {
+  position: absolute;
+  bottom: 100%;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(to bottom, rgba(200, 230, 255, 0.3), rgba(200, 230, 255, 0.8));
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 18px;
+  }
+
+  /* Trim the side padding as the card shrinks so the title and input keep a usable width; gap stays equal to the vertical padding */
+  .app {
+    --gap: 26px;
+    padding: var(--gap) 28px;
+    border-radius: 22px;
+  }
+
+  #cityField {
+    padding: 16px 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+    align-items: center;
+  }
+
+  .app {
+    --gap: 22px;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 24px;
+    padding: var(--gap) 20px;
+  }
+
+  /* A phone draws the title's letters a pixel or so further inside its line, so it is pulled in a little more */
+  h1 {
+    margin: calc(0.15 * var(--btn-size) - 0.2em) 0 calc(0.15 * var(--btn-size) - 0.265em);
+  }
+
+  #cityField {
+    padding: 14px 16px;
+  }
+
+  .city-list li {
+    padding: 14px 16px;
+  }
+
+  .weather-box {
+    padding: 22px;
+  }
+
+  .spinner {
+    width: 30px;
+    height: 30px;
+    border-width: 4px;
+  }
+}
+
+/* Sizing grows with the window's height (tan(atan2(a, b)) is a/b as the bare number zoom needs).
+   Tablet-shaped screens keep the 800px reference, so the iPad Mini stays where it is, while the 1.6 cap
+   lets the taller iPad Pro and Surface in portrait fill about the same share of the screen as the Mini.
+   Widescreen desktops and the Nest Hub are sized so the panel fits the window with the weather card
+   open and some air around it: that state is at most 648px tall at zoom 1 (the script keeps each line of
+   the card to one line), the 48px takes off the body padding, and the 700px reference, rather than 648px,
+   is what keeps the panel a touch smaller than a tight fit on these screens. Wide 4:3/3:2 windows (the
+   iPad Pro and Surface in landscape) grow from a 720px reference. Phones (<768px) keep their size. */
+@media (min-width: 768px) and (max-aspect-ratio: 31/20) {
+  .app { zoom: clamp(0.95, tan(atan2(100vh, 800px)), 1.6); }
+}
+
+@media (min-width: 768px) and (min-aspect-ratio: 31/20) {
+  .app { zoom: clamp(0.85, tan(atan2(100vh - 48px, 700px)), 1.5); }
+}
+
+@media (min-width: 1100px) and (max-aspect-ratio: 31/20) {
+  .app { zoom: clamp(0.95, tan(atan2(100vh, 720px)), 1.6); }
+}
