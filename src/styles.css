@@ -1,0 +1,289 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #9ed8ff, #5fa8d3);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.app {
+  /* One gap sets the space between the components and the padding above and below them, so all of them are equal */
+  --gap: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  background: rgba(20, 50, 80, 0.75);
+  padding: var(--gap) 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  margin: auto;
+  /* Lets the title size itself from the panel's width (the cqw unit below) */
+  container-type: inline-size;
+  /* The button's text size, which the weather card's spacing below it reads as well */
+  --btn-size: clamp(1.2rem, 5.1vw, 1.6rem);
+}
+
+h1 {
+  /* Pulls the title in so its letters sit as far from the border and the input as the button's letters sit from the input */
+  margin: calc(0.15 * var(--btn-size) - 0.17em) 0 calc(0.15 * var(--btn-size) - 0.22em);
+  /* "Weather Dashboard" in Arial Bold is 9.43 times as wide as its size, so 100cqw / 9.72 runs it across 97% of the input */
+  font-size: clamp(1.1rem, 100cqw / 9.72, 3rem);
+  white-space: nowrap;
+}
+
+/* Anchors the suggestion list below the input */
+.search-box {
+  position: relative;
+}
+
+#cityField {
+  width: 100%;
+  padding: 19px 22px;
+  font-size: clamp(15px, 4.4vw, 22px);
+  border: none;
+  background: rgba(180, 220, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(5px);
+  transition: background 0.3s;
+  border-radius: 30px;
+}
+
+/* Squares off the bottom corners while the list is open, so the input and the list look like one piece */
+#cityField.show {
+  border-radius: 30px 30px 0 0;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+#cityField::placeholder {
+  color: rgba(200, 230, 255, 0.65);
+}
+
+#cityField:focus {
+  outline: none;
+  background: rgba(180, 220, 255, 0.25);
+}
+
+.city-list {
+  list-style: none;
+  background: rgba(180, 220, 255, 0.25);
+  color: #fff;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  max-height: 180px;
+  overflow: hidden;
+  font-size: clamp(15px, 4.4vw, 22px);
+  backdrop-filter: blur(5px);
+}
+
+.city-list li {
+  padding: 16px 22px;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.city-list li:hover,
+.city-list li.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.city-list li:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.geo-btn {
+  display: block;
+  /* The button's letters sit nearer the edges of their line than the title's do, so 2px either side evens out the space */
+  margin: 2px 0;
+  /* Lifted 2px, as mostly lowercase text sits low in its line and would otherwise look closer to the edge below */
+  position: relative;
+  top: -2px;
+  color: #a6ddff;
+  font-size: var(--btn-size);
+  cursor: pointer;
+  transition: 0.3s;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.geo-btn:hover {
+  color: #cfeeff;
+}
+
+.geo-btn:active {
+  opacity: 0.8;
+}
+
+.geo-btn:focus-visible {
+  outline: 2px solid rgba(200, 230, 255, 0.8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Pulls the card up by the button's lift, margin and unused descender room, so it sits a gap below the button's letters */
+.weather-box {
+  display: none;
+  margin-top: calc(-4px - 0.26 * var(--btn-size));
+  padding: 28px;
+  background: rgba(180, 220, 255, 0.1);
+  border-radius: 18px;
+}
+
+.weather-box h2 {
+  margin-bottom: 14px;
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+  /* A single word too long for the card breaks rather than running past it */
+  overflow-wrap: anywhere;
+}
+
+/* The place and the country each stay on one line, so a name that needs two breaks after its comma */
+.weather-box h2 span {
+  white-space: nowrap;
+}
+
+.weather-box p {
+  margin: 6px 0;
+  font-size: clamp(1.15rem, 5.8vw, 1.85rem);
+}
+
+/* Leaves as much room under the last line as the name's line leaves over its capitals, about a sixth of the name's size */
+.weather-box p:last-child {
+  margin-bottom: calc(0.165 * var(--heading-size, 2.5rem) - 0.05em);
+}
+
+.spinner {
+  border: 5px solid rgba(180, 220, 255, 0.15);
+  border-top: 5px solid rgba(166, 221, 255, 0.6);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+  /* Sits as far below the button's text as above the bottom border, so the top pulls in further by the button's offsets */
+  margin: -12px auto -2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Covers the window without catching clicks, so the rain never gets in the way */
+.rain-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Raindrops begin above the viewport and animate downward */
+.drop {
+  position: absolute;
+  bottom: 100%;
+  width: 2px;
+  height: 50px;
+  background: linear-gradient(to bottom, rgba(200, 230, 255, 0.3), rgba(200, 230, 255, 0.8));
+  border-radius: 0 0 50% 50%;
+  filter: blur(1px);
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 18px;
+  }
+
+  /* Narrower side padding keeps the title and the input wide enough as the panel shrinks */
+  .app {
+    --gap: 26px;
+    padding: var(--gap) 28px;
+    border-radius: 22px;
+  }
+
+  #cityField {
+    padding: 16px 19px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .app {
+    --gap: 22px;
+    border-radius: 24px;
+    padding: var(--gap) 20px;
+  }
+
+  /* A phone draws the title's letters a pixel or so further inside its line, so it is pulled in a little more */
+  h1 {
+    margin: calc(0.15 * var(--btn-size) - 0.2em) 0 calc(0.15 * var(--btn-size) - 0.265em);
+  }
+
+  #cityField {
+    padding: 14px 16px;
+  }
+
+  .city-list li {
+    padding: 14px 16px;
+  }
+
+  .weather-box {
+    padding: 22px;
+  }
+
+  .spinner {
+    width: 30px;
+    height: 30px;
+    border-width: 4px;
+  }
+}
+
+/* tan(atan2(100vh, 800px)) is the window's height over 800px as a plain number, so tablet-shaped screens grow with it */
+@media (min-width: 768px) and (max-aspect-ratio: 31/20) {
+  .app { zoom: clamp(0.95, tan(atan2(100vh, 800px)), 1.6); }
+}
+
+/* Wide screens are sized so the panel with its weather card open fits the window with some room to spare */
+@media (min-width: 768px) and (min-aspect-ratio: 31/20) {
+  .app { zoom: clamp(0.85, tan(atan2(100vh - 48px, 700px)), 1.5); }
+}
+
+/* Windows 1100px and wider in a 4:3 or 3:2 shape, such as tablets in landscape, grow from a 720px reference instead */
+@media (min-width: 1100px) and (max-aspect-ratio: 31/20) {
+  .app { zoom: clamp(0.95, tan(atan2(100vh, 720px)), 1.6); }
+}
